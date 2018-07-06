@@ -18,3 +18,8 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/mail',function(){
+    $user = \App\Model\User::first();
+    return new \App\Mail\RegisterToken($user);
+});
