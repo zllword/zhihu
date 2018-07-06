@@ -28,6 +28,6 @@ class LogSentMessage
      */
     public function handle(MessageSending $event)
     {
-        Log::info('mail message: ' . $event->message . 'data: ' . json_encode($event->data));
+        Log::info('mail message: ' . json_encode($event->data));
     }
 }
