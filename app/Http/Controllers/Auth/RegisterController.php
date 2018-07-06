@@ -74,10 +74,10 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        $message = (new RegisterToken($user))->onQueue('email');
+        $message = (new RegisterToken($user))->onQueue('mail');
 
         Mail::to($user->email)
-            ->queue($message);
+            ->sendNow($message);
 
         return $user;
     }

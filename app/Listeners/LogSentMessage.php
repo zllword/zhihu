@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Mail\RegisterToken;
+use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -26,8 +26,8 @@ class LogSentMessage
      * @param  object  $event
      * @return void
      */
-    public function handle(RegisterToken $event)
+    public function handle(MessageSending $event)
     {
-        Log::info('mail send: ' . $event->user->name);
+        Log::info('mail message: ' . $event->message . 'data: ' . json_encode($event->data));
     }
 }
