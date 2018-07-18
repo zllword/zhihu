@@ -19,7 +19,13 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get('/mail',function(){
+
+Route::prefix('mail')->group(function () {
+    Route::get('verify/{token}', ['as' => 'email.verify', 'uses' => 'EmailController@verify']);
+    Route::get('has-been-send', 'EmailController@hasBeenSend');
+});
+
+Route::get('/mail', function () {
     $user = \App\Model\User::first();
     return new \App\Mail\RegisterToken($user);
 });

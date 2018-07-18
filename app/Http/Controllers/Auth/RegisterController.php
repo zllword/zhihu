@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Mail\RegisterToken;
 use App\Model\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -46,16 +48,25 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
+    public function register(Request $request)
+    {
+        $this->validator($request->all())->validate();
+
+        event(new Registered($user = $this->create($request->all())));
+
+        return redirect('/mail/has-been-send');
+    }
+
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param  array  $data
+     * @param  array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
         ]);
@@ -67,17 +78,16 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'avatar'=>'/images/avatars/default.png',
-            'confirmation_token'=>str_random(48),
-            'password' => Hash::make($data['password']),
-        ]);
+                                 'name' => $data['name'],
+                                 'email' => $data['email'],
+                                 'avatar' => '/images/avatars/default.png',
+                                 'confirmation_token' => str_random(48),
+                                 'password' => Hash::make($data['password']),
+                             ]);
 
         $message = (new RegisterToken($user))->onQueue('mail');
+        Mail::to($user->email)->sendNow($message);
 
-        Mail::to($user->email)
-            ->sendNow($message);
 
         return $user;
     }
