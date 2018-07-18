@@ -20,7 +20,7 @@ class EmailController extends Controller
         $user->save();
 
         Auth::login($user);
-        redirect('/home');
+        return redirect('/home');
     }
 
     public function hasBeenSend()
